@@ -23,6 +23,7 @@
 #include "libavutil/avstring.h"
 #include "libavutil/intfloat.h"
 #include "avformat.h"
+#include <stdio.h>
 
 #include "rtmppkt.h"
 #include "flv.h"
@@ -223,6 +224,7 @@ static int rtmp_packet_read_one_chunk(URLContext *h, RTMPPacket *p,
         if (ffurl_read_complete(h, buf, 4) != 4)
             return AVERROR(EIO);
         timestamp = AV_RB32(buf);
+        printf("Chunk type %i extended timestamp field: 0x%X\n", hdr, timestamp);
     } else {
         timestamp = ts_field;
     }
@@ -324,6 +326,7 @@ int ff_rtmp_packet_write(URLContext *h, RTMPPacket *pkt,
     }
     if (timestamp >= 0xFFFFFF) {
         pkt->ts_field = 0xFFFFFF;
+        printf("Extended timestamp field: 0x%lX\n", (unsigned long)timestamp);
     } else {
         pkt->ts_field = timestamp;
     }
